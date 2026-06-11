@@ -1,0 +1,28 @@
+node_modules
+out
+dist
+release
+release.broken
+release-build
+release-backup-*
+dist-release
+build-output
+build-output-*
+*.log
+test_*.mov
+test_*.mp4
+.DS_Store
+Thumbs.db
+*.blockmap
+builder-debug.yml
+builder-effective-config.yaml
+
+# Bundled FFmpeg binaries (run npm run fetch-ffmpeg after clone)
+resources/ffmpeg/*.exe
+!resources/ffmpeg/.gitkeep
+resources/.icon-*.png
+
+# Editor / OS
+.cursor
+.vscode/*
+!.vscode/extensions.json

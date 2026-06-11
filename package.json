@@ -1,0 +1,72 @@
+{
+  "name": "media-encoder",
+  "version": "1.0.0",
+  "description": "Media Encoder - transcode to MP4, Apple ProRes, and HAP",
+  "main": "./out/main/index.js",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "postinstall": "electron-builder install-app-deps",
+    "clean": "node scripts/clean.mjs",
+    "predist": "node scripts/ensure-ffmpeg.mjs",
+    "dist": "npm run build && electron-builder --publish never",
+    "start": "npm run build && electron .",
+    "fetch-ffmpeg": "powershell -ExecutionPolicy Bypass -File scripts/fetch-ffmpeg.ps1",
+    "generate-icon": "node scripts/generate-icon.mjs",
+    "prebuild": "npm run generate-icon"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^2.3.0",
+    "png-to-ico": "^2.1.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sharp": "^0.33.5",
+    "typescript": "^5.5.0",
+    "vite": "^5.3.0"
+  },
+  "build": {
+    "appId": "com.mediaencoder.app",
+    "productName": "MEDIA ENCODER",
+    "directories": {
+      "output": "dist-release"
+    },
+    "files": [
+      "out/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/ffmpeg",
+        "to": "ffmpeg",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "resources/icon.ico",
+        "to": "icon.ico"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "resources/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
