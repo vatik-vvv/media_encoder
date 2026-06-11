@@ -21,7 +21,7 @@ npm run fetch-ffmpeg   # full FFmpeg build (required for HAP)
 npm run dev
 ```
 
-`generate-icon` runs automatically on `npm run build` (source: `MP4encoder_icon2.png`).
+`generate-icon` runs automatically on `npm run build` (source: `MEencoder_icon.png`).
 
 ## Build installer
 

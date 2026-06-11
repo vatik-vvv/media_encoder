@@ -2,7 +2,7 @@ import { rmSync, existsSync } from 'fs'
 import { join } from 'path'
 
 const root = join(import.meta.dirname, '..')
-const dirs = ['out', 'release', 'release.broken', 'dist-release', 'dist']
+const dirs = ['out', 'release', 'release.broken', 'dist-release', 'dist-out', 'dist-build', 'dist']
 
 let hadErrors = false
 

@@ -1,5 +1,5 @@
 /**
- * Builds resources/icon.ico (multi-size) from MP4encoder_icon2.png
+ * Builds resources/icon.ico (multi-size) from MEencoder_icon.png
  */
 import { writeFileSync, existsSync, unlinkSync } from 'fs'
 import { join, dirname } from 'path'
@@ -8,7 +8,7 @@ import sharp from 'sharp'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, '..')
-const pngPath = join(root, 'MP4encoder_icon2.png')
+const pngPath = join(root, 'MEencoder_icon.png')
 const outIco = join(root, 'resources', 'icon.ico')
 const ICO_SIZES = [256, 128, 64, 48, 32, 16]
 
@@ -34,7 +34,7 @@ try {
   const pngToIco = (await import('png-to-ico')).default
   const buf = await pngToIco(tempPaths)
   writeFileSync(outIco, buf)
-  console.log('Wrote', outIco, `(${ICO_SIZES.length} sizes from MP4encoder_icon2.png)`)
+  console.log('Wrote', outIco, `(${ICO_SIZES.length} sizes from MEencoder_icon.png)`)
 } finally {
   for (const tempPath of tempPaths) {
     try {

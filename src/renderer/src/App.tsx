@@ -16,7 +16,7 @@ import SettingsDialog from './components/SettingsDialog'
 import ImportReviewDialog from './components/ImportReviewDialog'
 import SourceDropZone from './components/SourceDropZone'
 import VertSplitPane from './components/VertSplitPane'
-import logoMet2 from '../../../logo_met2.png'
+import appIcon from '../../../MEencoder_icon.png'
 import { clampTrimFrames, frameToTimecode, getTrimFrameBounds, initTrimForSource } from '@shared/trim'
 import { resolveInputFps } from '@shared/fps'
 
@@ -419,7 +419,7 @@ export default function App(): JSX.Element {
     <div className="app">
       <header className="app-header">
         <div className="app-brand">
-          <img src={logoMet2} alt="" className="app-logo" />
+          <img src={appIcon} alt="" className="app-logo" />
           <h1>MEDIA ENCODER</h1>
         </div>
         <button type="button" className="secondary" onClick={() => setShowSettings(true)}>

@@ -6,6 +6,8 @@ release.broken
 release-build
 release-backup-*
 dist-release
+dist-out
+dist-build
 build-output
 build-output-*
 *.log
@@ -21,6 +23,7 @@ builder-effective-config.yaml
 resources/ffmpeg/*.exe
 !resources/ffmpeg/.gitkeep
 resources/.icon-*.png
+resources/icon.ico
 
 # Editor / OS
 .cursor
