@@ -16,6 +16,7 @@ export async function reviewItemToQueueItem(
     error: _e,
     sourceType,
     sourcePath,
+    sequenceInputPattern,
     analysis,
     outputDirOverride,
     outputFileName,
@@ -45,6 +46,7 @@ export async function reviewItemToQueueItem(
   return {
     ...queueItem,
     ...encodeSettings,
+    sequenceInputPattern,
     outputDirOverride,
     outputFileName,
     outputPathOverride: fullPath

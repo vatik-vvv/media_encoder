@@ -10,16 +10,20 @@ export async function prepareImportItems(paths: string[]): Promise<PreparedImpor
   for (const d of discovered) {
     try {
       if (d.sourceType === 'sequence') {
-        const seq = await analyzeSequence(d.sourcePath)
+        const seq = await analyzeSequence(d.sourcePath, undefined, {
+          inputPattern: d.sequenceInputPattern
+        })
         const analysis = await analyzeSource('sequence', d.sourcePath, {
           frameCount: seq.frameCount,
           sequenceStartFrame: seq.sequenceStartFrame,
-          sequenceEndFrame: seq.sequenceEndFrame
+          sequenceEndFrame: seq.sequenceEndFrame,
+          sourceName: d.displayName
         })
         items.push({
           sourceType: d.sourceType,
           sourcePath: d.sourcePath,
           displayName: d.displayName,
+          sequenceInputPattern: d.sequenceInputPattern,
           analysis
         })
       } else {

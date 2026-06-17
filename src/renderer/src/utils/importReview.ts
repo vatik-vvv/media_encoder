@@ -23,6 +23,7 @@ export function preparedToReviewItems(
       sourceType: p.sourceType,
       sourcePath: p.sourcePath,
       displayName: p.displayName,
+      sequenceInputPattern: p.sequenceInputPattern,
       analysis: p.analysis,
       error: p.error,
       outputFileName: defaultOutputFileName(sourceName, defaults.outputFormat),

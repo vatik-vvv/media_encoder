@@ -75,6 +75,8 @@ export interface QueueItem extends EncodeSettings {
   id: string
   sourceType: SourceType
   sourcePath: string
+  /** FFmpeg image-sequence path when a folder contains multiple render passes. */
+  sequenceInputPattern?: string
   analysis?: SourceAnalysis
   outputDirOverride?: string
   outputFileName?: string

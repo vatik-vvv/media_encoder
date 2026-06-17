@@ -60,18 +60,23 @@ export class QueueRunner {
 
         if (!analysis) {
           if (item.sourceType === 'sequence') {
-            sequenceInfo = await analyzeSequence(item.sourcePath, trim)
+            sequenceInfo = await analyzeSequence(item.sourcePath, trim, {
+              inputPattern: item.sequenceInputPattern
+            })
             concatPath = sequenceInfo.concatListPath
             analysis = await analyzeSource(item.sourceType, item.sourcePath, {
               frameCount: sequenceInfo.frameCount,
               sequenceStartFrame: sequenceInfo.sequenceStartFrame,
-              sequenceEndFrame: sequenceInfo.sequenceEndFrame
+              sequenceEndFrame: sequenceInfo.sequenceEndFrame,
+              sourceName: item.analysis?.sourceName
             })
           } else {
             analysis = await analyzeSource(item.sourceType, item.sourcePath)
           }
         } else if (item.sourceType === 'sequence') {
-          sequenceInfo = await analyzeSequence(item.sourcePath, trim)
+          sequenceInfo = await analyzeSequence(item.sourcePath, trim, {
+            inputPattern: item.sequenceInputPattern
+          })
           concatPath = sequenceInfo.concatListPath
         }
 

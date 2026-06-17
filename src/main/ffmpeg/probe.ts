@@ -83,9 +83,9 @@ export function buildAnalysisFromSequence(
   width?: number,
   height?: number,
   sequenceStartFrame?: number,
-  sequenceEndFrame?: number
+  sequenceEndFrame?: number,
+  sourceName?: string
 ): SourceAnalysis {
-  const sourceName = basename(folderPath)
   return {
     sourceType: 'sequence',
     sourcePath: folderPath,
@@ -94,7 +94,7 @@ export function buildAnalysisFromSequence(
     sequenceEndFrame,
     width,
     height,
-    sourceName,
+    sourceName: sourceName ?? basename(folderPath),
     sourceDir: dirname(folderPath),
     sourceExt: 'sequence'
   }
@@ -109,6 +109,7 @@ export async function analyzeSource(
     height?: number
     sequenceStartFrame?: number
     sequenceEndFrame?: number
+    sourceName?: string
   }
 ): Promise<SourceAnalysis> {
   if (sourceType === 'video') {
@@ -120,6 +121,7 @@ export async function analyzeSource(
     sequenceMeta?.width,
     sequenceMeta?.height,
     sequenceMeta?.sequenceStartFrame,
-    sequenceMeta?.sequenceEndFrame
+    sequenceMeta?.sequenceEndFrame,
+    sequenceMeta?.sourceName
   )
 }

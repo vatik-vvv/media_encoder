@@ -6,6 +6,7 @@ export interface ImportReviewItem extends EncodeSettings {
   sourceType: SourceType
   sourcePath: string
   displayName: string
+  sequenceInputPattern?: string
   analysis?: SourceAnalysis
   error?: string
   /** Custom output folder; file name is set separately. */
@@ -17,12 +18,15 @@ export interface DiscoveredSource {
   sourceType: SourceType
   sourcePath: string
   displayName: string
+  /** FFmpeg image-sequence path when folder holds multiple passes, e.g. `D:\\render\\front.%04d.png`. */
+  sequenceInputPattern?: string
 }
 
 export interface PreparedImportItem {
   sourceType: SourceType
   sourcePath: string
   displayName: string
+  sequenceInputPattern?: string
   analysis?: SourceAnalysis
   error?: string
 }

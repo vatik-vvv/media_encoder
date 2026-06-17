@@ -3,6 +3,11 @@ import { join, extname, basename } from 'path'
 import { tmpdir } from 'os'
 import { randomBytes } from 'crypto'
 import type { ResolvedTrim } from '@shared/trim'
+import {
+  filterBasenamesForPattern,
+  parseFrameSequenceFile,
+  filePatternForParsed
+} from '@shared/sequenceGrouping'
 
 const IMAGE_EXTS = new Set(['.png', '.jpg', '.jpeg', '.tif', '.tiff', '.exr'])
 
@@ -20,19 +25,8 @@ function isImageFile(name: string): boolean {
   return IMAGE_EXTS.has(extname(name).toLowerCase())
 }
 
-async function listFrames(folderPath: string): Promise<string[]> {
-  const entries = await readdir(folderPath, { withFileTypes: true })
-  const files = entries
-    .filter((e) => e.isFile() && isImageFile(e.name))
-    .map((e) => e.name)
-    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-  return files.map((f) => join(folderPath, f))
-}
-
 export function frameNumberFromBasename(name: string): number | undefined {
-  const match = basename(name).match(/^(.+?)(\d+)(\.[^.]+)$/)
-  if (!match) return undefined
-  return parseInt(match[2], 10)
+  return parseFrameSequenceFile(basename(name))?.frame
 }
 
 export function detectSequenceFrameRange(filePaths: string[]): {
@@ -57,14 +51,15 @@ function detectPattern(
   if (files.length === 0) return undefined
 
   const first = basename(files[0])
-  const match = first.match(/^(.+?)(\d+)(\.[^.]+)$/)
-  if (!match) return undefined
+  const parsed = parseFrameSequenceFile(first)
+  if (!parsed) return undefined
 
-  const [, prefix, numStr, extMatch] = match
-  const padLen = numStr.length
-  const startNumber = parseInt(numStr, 10)
-  const inputPath = join(folderPath, `${prefix}%0${padLen}d${extMatch}`)
-  return { inputPath, startNumber }
+  const inputPath = join(folderPath, filePatternForParsed(parsed))
+  return { inputPath, startNumber: parsed.frame }
+}
+
+export interface AnalyzeSequenceOptions {
+  inputPattern?: string
 }
 
 function sliceFramesForTrim(
@@ -79,9 +74,21 @@ function sliceFramesForTrim(
 
 export async function analyzeSequence(
   folderPath: string,
-  trim?: ResolvedTrim | null
+  trim?: ResolvedTrim | null,
+  options?: AnalyzeSequenceOptions
 ): Promise<SequenceInfo> {
-  const allFrames = await listFrames(folderPath)
+  const allBasenames = (await readdir(folderPath, { withFileTypes: true }))
+    .filter((e) => e.isFile() && isImageFile(e.name))
+    .map((e) => e.name)
+
+  const matchedBasenames = options?.inputPattern
+    ? filterBasenamesForPattern(allBasenames, basename(options.inputPattern))
+    : allBasenames
+
+  const allFrames = matchedBasenames
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    .map((f) => join(folderPath, f))
+
   if (allFrames.length === 0) {
     throw new Error('No image frames found in folder')
   }
@@ -97,7 +104,12 @@ export async function analyzeSequence(
     }
   }
 
-  const pattern = detectPattern(folderPath, frames)
+  const pattern = options?.inputPattern
+    ? {
+        inputPath: options.inputPattern,
+        startNumber: parseFrameSequenceFile(basename(allFrames[0]))?.frame
+      }
+    : detectPattern(folderPath, frames)
   if (pattern) {
     return {
       frameCount: frames.length,

@@ -2,6 +2,7 @@ import { readdir, stat } from 'fs/promises'
 import { extname, basename, dirname, join, normalize } from 'path'
 import type { DiscoveredSource } from '@shared/import'
 import type { SourceType } from '@shared/types'
+import { groupImageSequenceFiles } from '@shared/sequenceGrouping'
 
 const VIDEO_EXTS = new Set([
   '.mov',
@@ -26,8 +27,26 @@ function isImageFile(name: string): boolean {
   return IMAGE_EXTS.has(extname(name).toLowerCase())
 }
 
-function sourceKey(type: SourceType, path: string): string {
-  return `${type}:${normalize(path).toLowerCase()}`
+function sourceKey(type: SourceType, path: string, sequenceInputPattern?: string): string {
+  const base = `${type}:${normalize(path).toLowerCase()}`
+  if (!sequenceInputPattern) return base
+  return `${base}:${normalize(sequenceInputPattern).toLowerCase()}`
+}
+
+function addSequenceSource(
+  found: Map<string, DiscoveredSource>,
+  folderPath: string,
+  displayName: string,
+  sequenceInputPattern?: string
+): void {
+  const key = sourceKey('sequence', folderPath, sequenceInputPattern)
+  if (found.has(key)) return
+  found.set(key, {
+    sourceType: 'sequence',
+    sourcePath: folderPath,
+    displayName,
+    sequenceInputPattern
+  })
 }
 
 async function scanDirectory(
@@ -42,7 +61,7 @@ async function scanDirectory(
     return
   }
 
-  const imageCount = entries.filter((e) => e.isFile() && isImageFile(e.name)).length
+  const imageFiles = entries.filter((e) => e.isFile() && isImageFile(e.name)).map((e) => e.name)
 
   for (const entry of entries) {
     const fullPath = join(normalizedDir, entry.name)
@@ -58,15 +77,21 @@ async function scanDirectory(
     }
   }
 
-  if (imageCount >= 2) {
-    const key = sourceKey('sequence', normalizedDir)
-    if (!found.has(key)) {
-      found.set(key, {
-        sourceType: 'sequence',
-        sourcePath: normalizedDir,
-        displayName: basename(normalizedDir)
-      })
+  if (imageFiles.length >= 2) {
+    const groups = groupImageSequenceFiles(imageFiles)
+    const folderName = basename(normalizedDir)
+
+    if (groups.length > 0) {
+      for (const group of groups) {
+        const inputPattern = join(normalizedDir, group.filePattern)
+        const displayName =
+          groups.length === 1 && group.label === folderName ? folderName : group.label
+        addSequenceSource(found, normalizedDir, displayName, inputPattern)
+      }
+      return
     }
+
+    addSequenceSource(found, normalizedDir, folderName)
     return
   }
 
