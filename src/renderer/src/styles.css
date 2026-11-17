@@ -36,6 +36,18 @@ body {
   padding: 12px 16px;
   gap: 10px;
   overflow: hidden;
+  position: relative;
+}
+
+.app.drag-active::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 2px dashed var(--accent);
+  border-radius: 12px;
+  background: rgba(79, 140, 255, 0.06);
+  pointer-events: none;
+  z-index: 40;
 }
 
 .app-header {

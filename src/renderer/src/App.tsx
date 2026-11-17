@@ -36,13 +36,14 @@ export default function App(): JSX.Element {
   } | null>(null)
   const [log, setLog] = useState<string[]>([])
   const [queuePanePercent, setQueuePanePercent] = useState(68)
-  const [dropZoneDrag, setDropZoneDrag] = useState(false)
+  const [windowDrag, setWindowDrag] = useState(false)
   const [importReview, setImportReview] = useState<{
     items: ImportReviewItem[]
     loading: boolean
     message?: string
   } | null>(null)
   const splitSaveTimer = useRef<ReturnType<typeof setTimeout>>()
+  const windowDragDepth = useRef(0)
 
   useEffect(() => {
     void window.mencoder.getSettings().then((s) => {
@@ -177,22 +178,31 @@ export default function App(): JSX.Element {
     return paths
   }
 
-  const handleDropZoneDragOver = (e: DragEvent): void => {
+  const handleWindowDragEnter = (e: DragEvent): void => {
     e.preventDefault()
     e.stopPropagation()
-    setDropZoneDrag(true)
+    windowDragDepth.current += 1
+    setWindowDrag(true)
   }
 
-  const handleDropZoneDragLeave = (e: DragEvent): void => {
+  const handleWindowDragOver = (e: DragEvent): void => {
     e.preventDefault()
     e.stopPropagation()
-    setDropZoneDrag(false)
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy'
   }
 
-  const handleDropZoneDrop = (e: DragEvent): void => {
+  const handleWindowDragLeave = (e: DragEvent): void => {
     e.preventDefault()
     e.stopPropagation()
-    setDropZoneDrag(false)
+    windowDragDepth.current = Math.max(0, windowDragDepth.current - 1)
+    if (windowDragDepth.current === 0) setWindowDrag(false)
+  }
+
+  const handleWindowDrop = (e: DragEvent): void => {
+    e.preventDefault()
+    e.stopPropagation()
+    windowDragDepth.current = 0
+    setWindowDrag(false)
     const paths = extractDropPaths(e)
     if (paths.length > 0) void openImportFromPaths(paths)
   }
@@ -416,7 +426,13 @@ export default function App(): JSX.Element {
   )
 
   return (
-    <div className="app">
+    <div
+      className={`app ${windowDrag ? 'drag-active' : ''}`}
+      onDragEnter={handleWindowDragEnter}
+      onDragOver={handleWindowDragOver}
+      onDragLeave={handleWindowDragLeave}
+      onDrop={handleWindowDrop}
+    >
       <header className="app-header">
         <div className="app-brand">
           <img src={appIcon} alt="" className="app-logo" />
@@ -428,11 +444,8 @@ export default function App(): JSX.Element {
       </header>
 
       <SourceDropZone
-        dragOver={dropZoneDrag}
+        dragOver={windowDrag}
         disabled={encoding}
-        onDragOver={handleDropZoneDragOver}
-        onDragLeave={handleDropZoneDragLeave}
-        onDrop={handleDropZoneDrop}
         onAddVideos={() => void handleAddVideos()}
         onAddSequence={() => void handleAddSequence()}
       />
